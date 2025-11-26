@@ -6,9 +6,10 @@ build-backend = "hatchling.build"
 name = "graphql-schema-diff"
 description = "Compare GraphQL Schemas"
 readme = "README.md"
-version = "1.2.4"
+version = "1.2.4+kraken1"
 authors = [
-    { name = "Nahuel Ambrosini", email = "ambro17.1@gmail.com" }
+    { name = "Nahuel Ambrosini", email = "ambro17.1@gmail.com" },
+    { name = "Mattia Baldari", email = "mattia.baldari@kraken.tech" }
 ]
 dependencies = [
     "graphql-core>=3.0.1",
@@ -26,7 +27,7 @@ license = "GPL-3.0-or-later"
 schemadiff = "schemadiff.__main__:cli"
 
 [project.urls]
-Homepage = "https://github.com/Ambro17/graphql-schema-diff"
+Homepage = "https://github.com/octoenergy/graphql-schema-diff/"
 Documentation = "https://ambro17.github.io/graphql-schema-diff/"
 
 [project.optional-dependencies]
