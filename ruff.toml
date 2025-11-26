@@ -1,0 +1,74 @@
+target-version = "py313"
+line-length = 99
+extend-exclude = [
+    ".DS_Store",
+    ".pytest_cache",
+    "__pycache__",
+]
+
+[format]
+docstring-code-format = true
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "A001",     # https://docs.astral.sh/ruff/rules/builtin-variable-shadowing/
+    "A002",     # https://docs.astral.sh/ruff/rules/builtin-argument-shadowing/
+    "ANN",      # Skip all type annotation rules
+    "ARG001",   # https://docs.astral.sh/ruff/rules/unused-function-argument/
+    "ARG002",   # https://docs.astral.sh/ruff/rules/unused-method-argument/
+    "C901",     # https://docs.astral.sh/ruff/rules/complex-structure/
+    "COM812",   # https://docs.astral.sh/ruff/rules/missing-trailing-comma/
+    "D100",     # https://docs.astral.sh/ruff/rules/undocumented-public-module/
+    "D101",     # https://docs.astral.sh/ruff/rules/undocumented-public-class/
+    "D102",     # https://docs.astral.sh/ruff/rules/undocumented-public-method/
+    "D103",     # https://docs.astral.sh/ruff/rules/undocumented-public-function/
+    "D104",     # https://docs.astral.sh/ruff/rules/undocumented-public-package/
+    "D105",     # https://docs.astral.sh/ruff/rules/undocumented-magic-method/
+    "D107",     # https://docs.astral.sh/ruff/rules/undocumented-public-init/
+    "D203",     # https://docs.astral.sh/ruff/rules/incorrect-blank-line-before-class/
+    "D205",     # https://docs.astral.sh/ruff/rules/blank-line-after-summary/
+    "D212",     # https://docs.astral.sh/ruff/rules/multi-line-summary-first-line/
+    "D400",     # https://docs.astral.sh/ruff/rules/ends-in-period/
+    "D401",     # https://docs.astral.sh/ruff/rules/non-imperative-mood/
+    "E741",     # https://docs.astral.sh/ruff/rules/ambiguous-variable-name/
+    "E501",     # https://docs.astral.sh/ruff/rules/line-too-long/
+    "EM101",    # https://docs.astral.sh/ruff/rules/raw-string-in-exception/
+    "EM102",    # https://docs.astral.sh/ruff/rules/f-string-in-exception/
+    "ERA001",   # https://docs.astral.sh/ruff/rules/commented-out-code/
+    "FBT001",   # https://docs.astral.sh/ruff/rules/boolean-type-hint-positional-argument/
+    "FBT002",   # https://docs.astral.sh/ruff/rules/boolean-default-value-positional-argument/
+    "FBT003",   # https://docs.astral.sh/ruff/rules/boolean-positional-value-in-call/
+    "FIX002",   # https://docs.astral.sh/ruff/rules/line-contains-todo/
+    "ISC001",   # https://docs.astral.sh/ruff/rules/single-line-implicit-string-concatenation/
+    "ISC002",   # https://docs.astral.sh/ruff/rules/multi-line-implicit-string-concatenation/
+    "N806",     # https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function/
+    "N818",     # https://docs.astral.sh/ruff/rules/error-suffix-on-exception-name/
+    "PLR0911",  # https://docs.astral.sh/ruff/rules/too-many-return-statements/
+    "PLR0912",  # https://docs.astral.sh/ruff/rules/too-many-branches/
+    "PLR0913",  # https://docs.astral.sh/ruff/rules/too-many-arguments/
+    "PLR0915",  # https://docs.astral.sh/ruff/rules/too-many-statements/
+    "PLR2004",  # https://docs.astral.sh/ruff/rules/magic-value-comparison/
+    "PT018",    # https://docs.astral.sh/ruff/rules/pytest-composite-assertion/
+    "PTH123",   # https://docs.astral.sh/ruff/rules/builtin-open/
+    "RET504",   # https://docs.astral.sh/ruff/rules/unnecessary-assign/
+    "RUF012",   # https://docs.astral.sh/ruff/rules/mutable-class-default/
+    "RUF043",   # https://docs.astral.sh/ruff/rules/pytest-raises-ambiguous-pattern/
+    "S101",     # https://docs.astral.sh/ruff/rules/assert/
+    "S324",     # https://docs.astral.sh/ruff/rules/hashlib-insecure-hash-function/
+    "SIM108",   # https://docs.astral.sh/ruff/rules/if-else-block-instead-of-if-exp/
+    "TD002",    # https://docs.astral.sh/ruff/rules/missing-todo-author/
+    "TD003",    # https://docs.astral.sh/ruff/rules/missing-todo-link/
+    "TRY003",   # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
+    "UP035",    # https://docs.astral.sh/ruff/rules/deprecated-import/
+]
+
+[lint.per-file-ignores]
+"__init__.py" = [
+    "F401",     # https://docs.astral.sh/ruff/rules/unused-import/
+]
+"**/tests/**" = [
+    "S105",     # https://docs.astral.sh/ruff/rules/hardcoded-password-string/
+    "S106",     # https://docs.astral.sh/ruff/rules/hardcoded-password-func-arg/
+    "SLF001",   # https://docs.astral.sh/ruff/rules/private-member-access/
+]
