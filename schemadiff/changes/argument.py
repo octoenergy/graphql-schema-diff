@@ -2,7 +2,7 @@ from schemadiff.changes import Change, Criticality, is_safe_change_for_input_val
 
 
 class FieldAbstractArgumentChange(Change):
-    def __init__(self, parent_type, field, arg_name, old_arg, new_arg):
+    def __init__(self, parent_type, field, arg_name, old_arg, new_arg) -> None:
         self.parent = parent_type
         self.field_name = field
         self.arg_name = arg_name
@@ -10,16 +10,15 @@ class FieldAbstractArgumentChange(Change):
         self.new_arg = new_arg
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.parent.name}.{self.field_name}"
 
 
 class FieldArgumentDescriptionChanged(FieldAbstractArgumentChange):
-
     criticality = Criticality.safe()
 
     @property
-    def message(self):
+    def message(self) -> str:
         return (
             f"Description for argument `{self.arg_name}` on field `{self.parent}.{self.field_name}` "
             f"changed from `{self.old_arg.description}` to `{self.new_arg.description}`"
@@ -33,7 +32,7 @@ class FieldArgumentDefaultValueChanged(FieldAbstractArgumentChange):
     )
 
     @property
-    def message(self):
+    def message(self) -> str:
         return (
             f"Default value for argument `{self.arg_name}` on field `{self.parent}.{self.field_name}` "
             f"changed from `{self.old_arg.default_value!r}` to `{self.new_arg.default_value!r}`"
@@ -41,19 +40,18 @@ class FieldArgumentDefaultValueChanged(FieldAbstractArgumentChange):
 
 
 class FieldArgumentTypeChanged(FieldAbstractArgumentChange):
-
-    def __init__(self, parent_type, field, arg_name, old_arg, new_arg):
+    def __init__(self, parent_type, field, arg_name, old_arg, new_arg) -> None:
         super().__init__(parent_type, field, arg_name, old_arg, new_arg)
         self.criticality = (
-                Criticality.safe()
-                if is_safe_change_for_input_value(old_arg.type, new_arg.type)
-                else Criticality.breaking(
-                    "Changing the type of a field's argument can break existing queries that use this argument."
-                )
+            Criticality.safe()
+            if is_safe_change_for_input_value(old_arg.type, new_arg.type)
+            else Criticality.breaking(
+                "Changing the type of a field's argument can break existing queries that use this argument."
+            )
         )
 
     @property
-    def message(self):
+    def message(self) -> str:
         return (
             f"Type for argument `{self.arg_name}` on field `{self.parent}.{self.field_name}` "
             f"changed from `{self.old_arg.type}` to `{self.new_arg.type}`"

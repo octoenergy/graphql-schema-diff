@@ -1,14 +1,14 @@
 from schemadiff.changes.input import (
     InputFieldAdded,
-    InputFieldRemoved,
-    InputFieldDescriptionChanged,
     InputFieldDefaultChanged,
+    InputFieldDescriptionChanged,
+    InputFieldRemoved,
     InputFieldTypeChanged,
 )
 
 
 class InputObjectType:
-    def __init__(self, old_type, new_type):
+    def __init__(self, old_type, new_type) -> None:
         self.type = new_type
         self.old_fields = old_type.fields
         self.new_fields = new_type.fields
@@ -22,7 +22,10 @@ class InputObjectType:
         added = new_field_names - old_field_names
         removed = old_field_names - new_field_names
 
-        changes.extend(InputFieldAdded(self.type, field_name, self.new_fields[field_name]) for field_name in added)
+        changes.extend(
+            InputFieldAdded(self.type, field_name, self.new_fields[field_name])
+            for field_name in added
+        )
         changes.extend(InputFieldRemoved(self.type, field_name) for field_name in removed)
 
         common_types = old_field_names & new_field_names

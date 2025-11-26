@@ -3,8 +3,7 @@ from schemadiff.diff.field import Field
 
 
 class InterfaceType:
-
-    def __init__(self, old_interface, new_interface):
+    def __init__(self, old_interface, new_interface) -> None:
         self.old_face = old_interface
         self.new_face = new_interface
 
@@ -16,7 +15,9 @@ class InterfaceType:
 
         added = self.new_fields - self.old_fields
         removed = self.old_fields - self.new_fields
-        changes.extend(InterfaceFieldAdded(self.new_face, name, self.new_face.fields[name]) for name in added)
+        changes.extend(
+            InterfaceFieldAdded(self.new_face, name, self.new_face.fields[name]) for name in added
+        )
         changes.extend(InterfaceFieldRemoved(self.new_face, field_name) for field_name in removed)
 
         common = self.old_fields & self.new_fields

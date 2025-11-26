@@ -41,7 +41,8 @@ def test_schema_added_type():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     # Type Int was also added but its ignored because its a primitive.
     assert diff[0].message == "Type `AddedType` was added"
     assert diff[0].criticality == Criticality.safe()
@@ -72,12 +73,13 @@ def test_schema_removed_type():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     # Type Int was also removed but it is ignored because it's a primitive.
     assert diff[0].message == "Type `ToBeRemovedType` was removed"
     assert diff[0].criticality == Criticality.breaking(
-        'Removing a type is a breaking change. It is preferred to '
-        'deprecate and remove all references to this type first.'
+        "Removing a type is a breaking change. It is preferred to "
+        "deprecate and remove all references to this type first."
     )
 
 
@@ -101,10 +103,11 @@ def test_schema_query_fields_type_has_changes():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     assert diff[0].message == "`Query.field` type changed from `String!` to `Int!`"
     assert diff[0].criticality == Criticality.breaking(
-        'Changing a field type will break queries that assume its type'
+        "Changing a field type will break queries that assume its type"
     )
 
 
@@ -120,13 +123,14 @@ def test_named_typed_changed_type():
     }
     """)
     diff = Schema(a, b).diff()
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     assert diff[0].message == "`QueryParams` kind changed from `INPUT OBJECT` to `OBJECT`"
     assert diff[0].criticality == Criticality.breaking(
-        'Changing the kind of a type is a breaking change because '
-        'it can cause existing queries to error. For example, '
-        'turning an object type to a scalar type would break queries '
-        'that define a selection set for this type.'
+        "Changing the kind of a type is a breaking change because "
+        "it can cause existing queries to error. For example, "
+        "turning an object type to a scalar type would break queries "
+        "that define a selection set for this type."
     )
 
 
@@ -150,12 +154,12 @@ def test_schema_query_root_changed():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    print(diff)
-    assert diff and len(diff) == 3
+    assert diff
+    assert len(diff) == 3
     assert {x.message for x in diff} == {
-        'Type `ChangedQuery` was added',
-        'Type `Query` was removed',
-        'Schema query root has changed from `Query` to `ChangedQuery`'
+        "Type `ChangedQuery` was added",
+        "Type `Query` was removed",
+        "Schema query root has changed from `Query` to `ChangedQuery`",
     }
 
 
@@ -184,11 +188,11 @@ def test_schema_mutation_root_changed():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    print(diff)
-    assert diff and len(diff) == 2
+    assert diff
+    assert len(diff) == 2
     assert {x.message for x in diff} == {
-        'Type `Mutation` was added',
-        'Schema mutation root has changed from `None` to `Mutation`'
+        "Type `Mutation` was added",
+        "Schema mutation root has changed from `None` to `Mutation`",
     }
 
 
@@ -226,9 +230,9 @@ def test_schema_suscription_root_changed():
     }
     """)
     diff = Schema(old_schema, new_schema).diff()
-    print(diff)
-    assert diff and len(diff) == 2
+    assert diff
+    assert len(diff) == 2
     assert {x.message for x in diff} == {
-        'Type `ChangedSubscription` was added',
-        'Schema subscription root has changed from `Subscription` to `ChangedSubscription`'
+        "Type `ChangedSubscription` was added",
+        "Schema subscription root has changed from `Subscription` to `ChangedSubscription`",
     }

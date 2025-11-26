@@ -1,14 +1,13 @@
 from schemadiff.changes.enum import (
     EnumValueAdded,
-    EnumValueRemoved,
-    EnumValueDescriptionChanged,
     EnumValueDeprecationReasonChanged,
+    EnumValueDescriptionChanged,
+    EnumValueRemoved,
 )
 
 
 class EnumDiff:
-
-    def __init__(self, old_enum, new_enum):
+    def __init__(self, old_enum, new_enum) -> None:
         self.enum = new_enum
         self.old_values = old_enum.values
         self.new_values = new_enum.values
@@ -28,8 +27,12 @@ class EnumDiff:
             old_value = self.old_values[enum_name]
             new_value = self.new_values[enum_name]
             if old_value.description != new_value.description:
-                changes.append(EnumValueDescriptionChanged(self.enum, enum_name, old_value, new_value))
+                changes.append(
+                    EnumValueDescriptionChanged(self.enum, enum_name, old_value, new_value)
+                )
             if old_value.deprecation_reason != new_value.deprecation_reason:
-                changes.append(EnumValueDeprecationReasonChanged(self.enum, enum_name, old_value, new_value))
+                changes.append(
+                    EnumValueDeprecationReasonChanged(self.enum, enum_name, old_value, new_value)
+                )
 
         return changes

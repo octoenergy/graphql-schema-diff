@@ -4,11 +4,12 @@ from json import JSONDecodeError
 
 
 class InvalidAllowlist(Exception):
-    """Exception raised when the user provides an invalid json file of allowed changes"""
+    """Exception raised when the user provides an invalid json file of allowed changes."""
 
 
 def read_allowed_changes(file_content):
-    """Read a json file that defines a mapping of changes checksums to the reasons of why it is allowed.
+    """
+    Read a json file that defines a mapping of changes checksums to the reasons of why it is allowed.
 
     Compliant formats:
         {
@@ -36,8 +37,8 @@ def read_allowed_changes(file_content):
     if not isinstance(allowlist, dict):
         raise InvalidAllowlist("Allowlist must be a mapping.")
 
-    CHECKSUM_REGEX = re.compile(r'[a-fA-F0-9]{32}')
-    if any(not CHECKSUM_REGEX.match(checksum) for checksum in allowlist.keys()):
+    CHECKSUM_REGEX = re.compile(r"[a-fA-F0-9]{32}")
+    if any(not CHECKSUM_REGEX.match(checksum) for checksum in allowlist):
         raise InvalidAllowlist("All keys must be a valid md5 checksum")
 
     return allowlist

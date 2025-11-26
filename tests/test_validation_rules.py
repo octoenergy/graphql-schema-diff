@@ -4,40 +4,40 @@ from graphql import build_schema as schema
 from schemadiff.changes import Change, Criticality
 from schemadiff.changes.field import FieldArgumentAdded
 from schemadiff.changes.object import ObjectTypeFieldAdded
+from schemadiff.diff.schema import Schema
 from schemadiff.validation import validate_changes
 from schemadiff.validation_rules import (
-    ValidationRule,
+    AddEnumValueWithoutDescription,
     AddFieldWithoutDescription,
     AddTypeWithoutDescription,
-    AddEnumValueWithoutDescription,
     RemoveEnumValueDescription,
     RemoveTypeDescription,
+    ValidationRule,
 )
-from schemadiff.diff.schema import Schema
 
 
-@pytest.mark.parametrize('rule', ValidationRule.__subclasses__())
+@pytest.mark.parametrize("rule", ValidationRule.__subclasses__())
 def test_is_valid_defaults_to_true_for_any_other_change(rule):
     class UnexpectedChange(Change):
         criticality = Criticality.safe()
 
         @property
-        def message(self):
+        def message(self) -> str:
             return ""
 
         @property
-        def path(self):
+        def path(self) -> str:
             return ""
 
     assert rule(UnexpectedChange()).is_valid() is True
 
 
 def test_type_added_with_desc():
-    a = schema('''
+    a = schema("""
     type MyType{
         a: Int
     }
-    ''')
+    """)
     b = schema('''
     type MyType{
         a: Int
@@ -53,11 +53,11 @@ def test_type_added_with_desc():
 
 
 def test_type_added_with_desc_but_missing_desc_on_its_fields():
-    a = schema('''
+    a = schema("""
     type MyType{
         a: Int
     }
-    ''')
+    """)
     b = schema('''
     type MyType{
         a: Int
@@ -72,25 +72,25 @@ def test_type_added_with_desc_but_missing_desc_on_its_fields():
     diff = Schema(a, b).diff()
     assert AddTypeWithoutDescription(diff[0]).is_valid() is False
     assert AddTypeWithoutDescription(diff[0]).message == (
-        'Type `NewType` was added without a description for NewType (rule: '
-        '`add-type-without-description`).'
+        "Type `NewType` was added without a description for NewType (rule: "
+        "`add-type-without-description`)."
     )
 
 
 def test_type_added_without_desc():
-    a = schema('''
+    a = schema("""
     type MyType{
         a: Int
     }
-    ''')
-    b = schema('''
+    """)
+    b = schema("""
     type MyType{
         a: Int
     }
     type NewType{
         b: String!
     }
-    ''')
+    """)
     diff = Schema(a, b).diff()
     assert AddTypeWithoutDescription(diff[0]).is_valid() is False
 
@@ -102,11 +102,11 @@ def test_type_changed_desc_removed():
         a: Int
     }
     ''')
-    b = schema('''
+    b = schema("""
     type MyType{
         a: Int
     }
-    ''')
+    """)
     c = schema('''
     """"""
     type MyType{
@@ -121,17 +121,17 @@ def test_type_changed_desc_removed():
 
 
 def test_field_added_without_desc():
-    a = schema('''
+    a = schema("""
     type MyType{
         a: Int
     }
-    ''')
-    b = schema('''
+    """)
+    b = schema("""
     type MyType{
         a: Int
         b: String!
     }
-    ''')
+    """)
     c = schema('''
     type MyType{
         a: Int
@@ -147,17 +147,17 @@ def test_field_added_without_desc():
 
 
 def test_enum_added_without_desc():
-    a = schema('''
+    a = schema("""
     enum Letters {
         A
     }
-    ''')
-    b = schema('''
+    """)
+    b = schema("""
     enum Letters {
         A
         B
     }
-    ''')
+    """)
     c = schema('''
     enum Letters {
         A
@@ -179,18 +179,17 @@ def test_enum_value_removing_desc():
         A
     }
     ''')
-    b = schema('''
+    b = schema("""
     enum Letters {
         A
     }
-    ''')
+    """)
     diff = Schema(a, b).diff()
     assert RemoveEnumValueDescription(diff[0]).is_valid() is False
 
 
 def test_schema_added_field_no_desc():
-
-    schema_restrictions = ['add-field-without-description']
+    schema_restrictions = ["add-field-without-description"]
 
     old_schema = schema("""
     schema {
@@ -221,23 +220,25 @@ def test_schema_added_field_no_desc():
     """)
     diff = Schema(old_schema, new_schema).diff()
     # Type Int was also added but its ignored because its a primitive.
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     error_msg = (
-        'Field `other` was added to object type `AddedType` without a description for AddedType.other '
-        '(rule: `add-field-without-description`).'
+        "Field `other` was added to object type `AddedType` without a description for AddedType.other "
+        "(rule: `add-field-without-description`)."
     )
-    result =  validate_changes(diff, schema_restrictions)
+    result = validate_changes(diff, schema_restrictions)
     assert result.ok is False
-    assert result.errors and len(result.errors) == 1
+    assert result.errors
+    assert len(result.errors) == 1
     assert result.errors[0].reason == error_msg
-    assert diff[0].path == 'AddedType.other'
-    assert result.errors[0].change.path == 'AddedType.other'
-    assert result.errors[0].rule == 'add-field-without-description'
+    assert diff[0].path == "AddedType.other"
+    assert result.errors[0].change.path == "AddedType.other"
+    assert result.errors[0].rule == "add-field-without-description"
 
 
 # Register the new validation rule for the following two tests
 class FieldHasTooManyArguments(ValidationRule):
-    """Restrict adding fields with too many top level arguments"""
+    """Restrict adding fields with too many top level arguments."""
 
     name = "field-has-too-many-arguments"
     limit = 10
@@ -246,10 +247,7 @@ class FieldHasTooManyArguments(ValidationRule):
         if not isinstance(self.change, (ObjectTypeFieldAdded, FieldArgumentAdded)):
             return True
 
-        if len(self.args) > self.limit:
-            return False
-        else:
-            return True
+        return not len(self.args) > self.limit
 
     @property
     def args(self):
@@ -257,8 +255,10 @@ class FieldHasTooManyArguments(ValidationRule):
 
     @property
     def message(self):
-        return f"Field `{self.change.parent.name}.{self.change.field_name}` has too many arguments " \
-               f"({len(self.args)}>{self.limit}). Rule: {self.name}"
+        return (
+            f"Field `{self.change.parent.name}.{self.change.field_name}` has too many arguments "
+            f"({len(self.args)}>{self.limit}). Rule: {self.name}"
+        )
 
 
 def test_cant_create_mutation_with_more_than_10_arguments():
@@ -282,23 +282,25 @@ def test_cant_create_mutation_with_more_than_10_arguments():
     type Mutation {
         field: Int
         mutation_with_too_many_args(
-            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int 
+            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int
         ): Int
     }
     """)
 
     diff = Schema(old_schema, new_schema).diff()
     # Type Int was also added but its ignored because its a primitive.
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     error_msg = (
-        'Field `Mutation.mutation_with_too_many_args` has too many arguments (11>10). '
-        'Rule: field-has-too-many-arguments'
+        "Field `Mutation.mutation_with_too_many_args` has too many arguments (11>10). "
+        "Rule: field-has-too-many-arguments"
     )
-    result =  validate_changes(diff, schema_restrictions)
+    result = validate_changes(diff, schema_restrictions)
     assert result.ok is False
-    assert result.errors and len(result.errors) == 1
+    assert result.errors
+    assert len(result.errors) == 1
     assert result.errors[0].reason == error_msg
-    assert result.errors[0].change.path == 'Mutation.mutation_with_too_many_args'
+    assert result.errors[0].change.path == "Mutation.mutation_with_too_many_args"
     assert result.errors[0].rule == FieldHasTooManyArguments.name
 
 
@@ -313,7 +315,7 @@ def test_cant_add_arguments_to_mutation_if_exceeds_10_args():
     type Mutation {
         field: Int
         mutation_with_too_many_args(
-            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int 
+            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int
         ): Int
     }
     """)
@@ -326,31 +328,36 @@ def test_cant_add_arguments_to_mutation_if_exceeds_10_args():
     type Mutation {
         field: Int
         mutation_with_too_many_args(
-            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int 
+            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int
         ): Int
     }
     """)
 
     diff = Schema(old_schema, new_schema).diff()
     # Type Int was also added but its ignored because its a primitive.
-    assert diff and len(diff) == 1
+    assert diff
+    assert len(diff) == 1
     error_msg = (
-        'Field `Mutation.mutation_with_too_many_args` has too many arguments (11>10). '
-        'Rule: field-has-too-many-arguments'
+        "Field `Mutation.mutation_with_too_many_args` has too many arguments (11>10). "
+        "Rule: field-has-too-many-arguments"
     )
-    result =  validate_changes(diff, schema_restrictions)
+    result = validate_changes(diff, schema_restrictions)
     assert result.ok is False
-    assert result.errors and len(result.errors) == 1
+    assert result.errors
+    assert len(result.errors) == 1
     assert result.errors[0].reason == error_msg
-    assert result.errors[0].change.message == "Argument `a11: Int` added to `Mutation.mutation_with_too_many_args`"
+    assert (
+        result.errors[0].change.message
+        == "Argument `a11: Int` added to `Mutation.mutation_with_too_many_args`"
+    )
     assert result.errors[0].change.checksum() == "221964c2ab5bbc6bd1ed19bcd8d69e70"
     assert result.errors[0].rule == FieldHasTooManyArguments.name
 
-    assert diff[0].path == 'Mutation.mutation_with_too_many_args'
+    assert diff[0].path == "Mutation.mutation_with_too_many_args"
 
 
 def test_can_allow_rule_infractions():
-    CHANGE_ID = '221964c2ab5bbc6bd1ed19bcd8d69e70'
+    CHANGE_ID = "221964c2ab5bbc6bd1ed19bcd8d69e70"
     validation_rules = [FieldHasTooManyArguments.name]
 
     old_schema = schema("""
@@ -361,7 +368,7 @@ def test_can_allow_rule_infractions():
     type Mutation {
         field: Int
         mutation_with_too_many_args(
-            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int 
+            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int
         ): Int
     }
     """)
@@ -374,7 +381,7 @@ def test_can_allow_rule_infractions():
     type Mutation {
         field: Int
         mutation_with_too_many_args(
-            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int 
+            a1: Int, a2: Int, a3: Int, a4: Int, a5: Int, a6: Int, a7: Int, a8: Int, a9: Int, a10: Int, a11: Int
         ): Int
     }
     """)

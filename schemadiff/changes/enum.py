@@ -2,7 +2,7 @@ from schemadiff.changes import Change, Criticality
 
 
 class EnumValueAdded(Change):
-    def __init__(self, enum, value):
+    def __init__(self, enum, value) -> None:
         self.criticality = Criticality.dangerous(
             "Adding an enum value may break existing clients that were not "
             "programming defensively against an added case when querying an enum."
@@ -12,16 +12,16 @@ class EnumValueAdded(Change):
         self.description = enum.values[value].description
 
     @property
-    def message(self):
+    def message(self) -> str:
         return f"Enum value `{self.value}` was added to `{self.enum.name}` enum"
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.enum.name}.{self.value}"
 
 
 class EnumValueRemoved(Change):
-    def __init__(self, enum, value):
+    def __init__(self, enum, value) -> None:
         self.criticality = Criticality.breaking(
             "Removing an enum value will break existing queries that use this enum value"
         )
@@ -29,19 +29,18 @@ class EnumValueRemoved(Change):
         self.value = value
 
     @property
-    def message(self):
+    def message(self) -> str:
         return f"Enum value `{self.value}` was removed from `{self.enum.name}` enum"
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.enum.name}"
 
 
 class EnumValueDescriptionChanged(Change):
-
     criticality = Criticality.safe()
 
-    def __init__(self, enum, name, old_value, new_value):
+    def __init__(self, enum, name, old_value, new_value) -> None:
         self.enum = enum
         self.name = name
         self.old_value = old_value
@@ -59,17 +58,16 @@ class EnumValueDescriptionChanged(Change):
         return msg
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.enum.name}.{self.name}"
 
 
 class EnumValueDeprecationReasonChanged(Change):
-
     criticality = Criticality.safe(
         "A deprecated field can still be used by clients and will give them time to adapt their queries"
     )
 
-    def __init__(self, enum, name, old_value, new_value):
+    def __init__(self, enum, name, old_value, new_value) -> None:
         self.enum = enum
         self.name = name
         self.old_value = old_value
@@ -90,5 +88,5 @@ class EnumValueDeprecationReasonChanged(Change):
         return msg
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.enum.name}.{self.name}"
