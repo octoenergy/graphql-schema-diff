@@ -2,51 +2,48 @@ from schemadiff.changes import Change, Criticality
 
 
 class RemovedType(Change):
-
     criticality = Criticality.breaking(
         "Removing a type is a breaking change. "
         "It is preferred to deprecate and remove all references to this type first."
     )
 
-    def __init__(self, type_):
+    def __init__(self, type_) -> None:
         self.type_ = type_
 
     @property
-    def message(self):
+    def message(self) -> str:
         return f"Type `{self.type_.name}` was removed"
 
     @property
-    def path(self):
-        return f'{self.type_.name}'
+    def path(self) -> str:
+        return f"{self.type_.name}"
 
 
 class AddedType(Change):
-
     criticality = Criticality.safe()
 
-    def __init__(self, added_type):
+    def __init__(self, added_type) -> None:
         self.type = added_type
 
     @property
-    def message(self):
+    def message(self) -> str:
         return f"Type `{self.type.name}` was added"
 
     @property
-    def path(self):
-        return f'{self.type.name}'
+    def path(self) -> str:
+        return f"{self.type.name}"
 
 
 class TypeDescriptionChanged(Change):
-
     criticality = Criticality.safe()
 
-    def __init__(self, type_name, old_desc, new_desc):
+    def __init__(self, type_name, old_desc, new_desc) -> None:
         self.type = type_name
         self.old_desc = old_desc
         self.new_desc = new_desc
 
     @property
-    def message(self):
+    def message(self) -> str:
         return (
             f"Description for type `{self.type}` changed from "
             f"`{self.old_desc}` to `{self.new_desc}`"
@@ -65,15 +62,15 @@ class TypeKindChanged(Change):
         "would break queries that define a selection set for this type."
     )
 
-    def __init__(self, type_, old_kind, new_kind):
+    def __init__(self, type_, old_kind, new_kind) -> None:
         self.type_ = type_
         self.old_kind = old_kind
         self.new_kind = new_kind
 
     @property
-    def message(self):
+    def message(self) -> str:
         return f"`{self.type_}` kind changed from `{self.old_kind.value.upper()}` to `{self.new_kind.value.upper()}`"
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"{self.type_}"

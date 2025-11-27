@@ -1,4 +1,4 @@
-from graphql import build_schema, GraphQLSchema
+from graphql import GraphQLSchema, build_schema
 
 
 class SchemaLoader:
@@ -10,7 +10,7 @@ class SchemaLoader:
 
     @classmethod
     def from_file(cls, filepath: str) -> GraphQLSchema:
-        with open(filepath, encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             schema_string = f.read()
 
         return cls.from_sdl(schema_string)

@@ -1,16 +1,16 @@
 from pathlib import Path
 
 import pytest
-from graphql import is_schema, GraphQLSyntaxError
+from graphql import GraphQLSyntaxError, is_schema
 
 from schemadiff import diff, diff_from_file
 from schemadiff.schema_loader import SchemaLoader
 
-TESTS_DATA = Path(__file__).parent / 'data'
+TESTS_DATA = Path(__file__).parent / "data"
 
 
 def test_load_from_file():
-    schema = SchemaLoader.from_file(TESTS_DATA / 'simple_schema.gql')
+    schema = SchemaLoader.from_file(TESTS_DATA / "simple_schema.gql")
     assert is_schema(schema)
     assert len(schema.query_type.fields) == 2
 
@@ -20,12 +20,12 @@ def test_load_from_string():
     schema {
         query: Query
     }
-    
+
     type Query {
         a: ID!
         b: MyType
     }
-    
+
     type MyType {
         c: String
         d: Float
@@ -66,14 +66,16 @@ def test_diff_from_schema():
 
 
 def test_diff_from_file():
-    changes = diff_from_file(TESTS_DATA / 'simple_schema.gql', TESTS_DATA / 'simple_schema_dangerous_changes.gql')
+    changes = diff_from_file(
+        TESTS_DATA / "simple_schema.gql", TESTS_DATA / "simple_schema_dangerous_changes.gql"
+    )
     assert changes
     assert len(changes) == 2
 
 
 def test_load_invalid_schema():
     with pytest.raises(TypeError, match="Unknown type 'InvalidType'"):
-        SchemaLoader.from_file(TESTS_DATA / 'invalid_schema.gql')
+        SchemaLoader.from_file(TESTS_DATA / "invalid_schema.gql")
 
 
 @pytest.mark.parametrize("schema", ["", "{}", "\n{}\n", "[]"])

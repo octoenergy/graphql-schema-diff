@@ -1,10 +1,10 @@
-import sys
 import argparse
+import sys
 
 from schemadiff.allow_list import read_allowed_changes
 from schemadiff.diff.schema import Schema
-from schemadiff.schema_loader import SchemaLoader
 from schemadiff.formatting import print_diff, print_json
+from schemadiff.schema_loader import SchemaLoader
 from schemadiff.validation import rules_list, validate_changes
 
 
@@ -14,32 +14,55 @@ def cli():
 
 
 def parse_args(arguments):
-    parser = argparse.ArgumentParser(description='Schema comparator')
-    parser.add_argument('-o', '--old-schema',
-                        dest='old_schema',
-                        type=argparse.FileType('r', encoding='UTF-8'),
-                        help='Path to old graphql schema file',
-                        required=True)
-    parser.add_argument('-n', '--new-schema',
-                        dest='new_schema',
-                        type=argparse.FileType('r', encoding='UTF-8'),
-                        help='Path to new graphql schema file',
-                        required=True)
-    parser.add_argument('-j', '--as-json',
-                        action='store_true',
-                        help='Output a detailed summary of changes in json format',
-                        required=False)
-    parser.add_argument('-a', '--allow-list',
-                        type=argparse.FileType('r', encoding='UTF-8'),
-                        help='Path to the allowed list of changes')
-    parser.add_argument('-t', '--tolerant',
-                        action='store_true',
-                        help="Tolerant mode. Error out only if there's a breaking change but allow dangerous changes")
-    parser.add_argument('-s', '--strict',
-                        action='store_true',
-                        help="Strict mode. Error out on dangerous and breaking changes.")
-    parser.add_argument('-r', '--validation-rules', choices=rules_list(), nargs='*',
-                        help="Evaluate rules mode. Error out on changes that fail some validation rule.")
+    parser = argparse.ArgumentParser(description="Schema comparator")
+    parser.add_argument(
+        "-o",
+        "--old-schema",
+        dest="old_schema",
+        type=argparse.FileType("r", encoding="UTF-8"),
+        help="Path to old graphql schema file",
+        required=True,
+    )
+    parser.add_argument(
+        "-n",
+        "--new-schema",
+        dest="new_schema",
+        type=argparse.FileType("r", encoding="UTF-8"),
+        help="Path to new graphql schema file",
+        required=True,
+    )
+    parser.add_argument(
+        "-j",
+        "--as-json",
+        action="store_true",
+        help="Output a detailed summary of changes in json format",
+        required=False,
+    )
+    parser.add_argument(
+        "-a",
+        "--allow-list",
+        type=argparse.FileType("r", encoding="UTF-8"),
+        help="Path to the allowed list of changes",
+    )
+    parser.add_argument(
+        "-t",
+        "--tolerant",
+        action="store_true",
+        help="Tolerant mode. Error out only if there's a breaking change but allow dangerous changes",
+    )
+    parser.add_argument(
+        "-s",
+        "--strict",
+        action="store_true",
+        help="Strict mode. Error out on dangerous and breaking changes.",
+    )
+    parser.add_argument(
+        "-r",
+        "--validation-rules",
+        choices=rules_list(),
+        nargs="*",
+        help="Evaluate rules mode. Error out on changes that fail some validation rule.",
+    )
 
     return parser.parse_args(arguments)
 
@@ -79,5 +102,5 @@ def exit_code(changes, strict, some_change_is_restricted, tolerant) -> int:
     return exit_code
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(cli())

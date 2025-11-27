@@ -1,15 +1,14 @@
-from schemadiff import Change
-from typing import List, Dict, Any
-
 from dataclasses import dataclass
+from typing import Any
 
+from schemadiff import Change
 from schemadiff.validation_rules import ValidationRule
 
 
 @dataclass
 class ValidationResult:
     ok: bool
-    errors: List['ValidationError']
+    errors: list["ValidationError"]
 
 
 @dataclass
@@ -19,14 +18,18 @@ class ValidationError:
     change: Change
 
 
-def validate_changes(diff: List[Change], rules: List[str], allowed_changes: Dict[str, Any] = None) -> ValidationResult:
-    """Given a list of changes between schemas and a list of rules,
+def validate_changes(
+    diff: list[Change], rules: list[str], allowed_changes: dict[str, Any] | None = None
+) -> ValidationResult:
+    """
+    Given a list of changes between schemas and a list of rules,
     it runs all rules against the changes, to detect invalid changes.
-    It also admits an allowlist of accepted invalid changes to document exceptions to the rules
+    It also admits an allowlist of accepted invalid changes to document exceptions to the rules.
 
     Returns:
         bool: True if there is at least one restricted change,
             False otherwise.
+
     """
     allowed_changes = allowed_changes or {}
     is_valid = True

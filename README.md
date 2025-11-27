@@ -37,6 +37,35 @@ The lib requires python3.6 or greater to work. In order to install it run
 $ python3 -m pip install graphql-schema-diff
 ```
 
+## Development Setup
+If you want to contribute to this project, follow these steps to set up your development environment:
+
+```bash
+# Clone the repository
+$ git clone https://github.com/octoenergy/graphql-schema-diff.git
+$ cd graphql-schema-diff
+
+# Install the package in development mode with dev dependencies
+$ pip install -e ".[dev]"
+
+# Install pre-commit hooks (recommended)
+$ pre-commit install
+```
+
+The pre-commit hooks will automatically run `ruff` linting and formatting checks before each commit.
+You can also run the checks manually:
+
+```bash
+# Run all pre-commit hooks on all files
+$ pre-commit run --all-files
+
+# Run ruff linter
+$ ruff check .
+
+# Run ruff formatter
+$ ruff format .
+```
+
 ## Usage
 You can use this package as a lib or as a CLI. You can choose what better suits your needs
 

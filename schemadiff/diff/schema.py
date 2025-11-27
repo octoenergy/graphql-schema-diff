@@ -2,16 +2,16 @@ from functools import partial
 
 from graphql import (
     is_enum_type,
-    is_union_type,
     is_input_object_type,
-    is_object_type,
     is_interface_type,
+    is_object_type,
+    is_union_type,
 )
 
-from schemadiff.changes.directive import RemovedDirective, AddedDirective
+from schemadiff.changes.directive import AddedDirective, RemovedDirective
 from schemadiff.changes.schema import (
-    SchemaQueryTypeChanged,
     SchemaMutationTypeChanged,
+    SchemaQueryTypeChanged,
     SchemaSubscriptionTypeChanged,
 )
 from schemadiff.changes.type import (
@@ -22,36 +22,40 @@ from schemadiff.changes.type import (
 )
 from schemadiff.diff.directive import Directive
 from schemadiff.diff.enum import EnumDiff
+from schemadiff.diff.input_object_type import InputObjectType
 from schemadiff.diff.interface import InterfaceType
 from schemadiff.diff.object_type import ObjectType
 from schemadiff.diff.union_type import UnionType
-from schemadiff.diff.input_object_type import InputObjectType
+
 
 def _get_type_resolvers():
     """Get TypeResolvers/TypeFields with fallback for different graphql-core versions."""
     # Try modern graphql-core (>= 3.2.7) - TypeFields is the official replacement
     try:
-        from graphql.type.introspection import TypeFields
-        return TypeFields
+        from graphql.type.introspection import TypeFields  # noqa: PLC0415
     except ImportError:
         pass
+    else:
+        return TypeFields
 
     # Try graphql-core 3.2.0 - 3.2.6
     try:
-        from graphql.type.introspection import TypeResolvers
-        return TypeResolvers
+        from graphql.type.introspection import TypeResolvers  # noqa: PLC0415
     except ImportError:
         pass
+    else:
+        return TypeResolvers
 
     # Fallback for older graphql-core (< 3.2.0)
     try:
-        from graphql.type.introspection import TypeFieldResolvers
-        return TypeFieldResolvers
+        from graphql.type.introspection import TypeFieldResolvers  # noqa: PLC0415
     except ImportError:
         raise ImportError(
             "Could not import TypeFields, TypeResolvers, or TypeFieldResolvers from graphql-core. "
             "Please upgrade to a supported version of graphql-core."
-        )
+        ) from None
+    else:
+        return TypeFieldResolvers
 
 
 TypeResolvers = _get_type_resolvers()
@@ -60,11 +64,19 @@ type_kind = partial(TypeResolvers.kind, _info={})
 
 
 class Schema:
-    primitives = {'String', 'Int', 'Float', 'Boolean', 'ID'}
-    internal_types = {'__Schema', '__Type', '__TypeKind', '__Field', '__InputValue', '__EnumValue',
-                      '__Directive', '__DirectiveLocation'}
+    primitives = {"String", "Int", "Float", "Boolean", "ID"}
+    internal_types = {
+        "__Schema",
+        "__Type",
+        "__TypeKind",
+        "__Field",
+        "__InputValue",
+        "__EnumValue",
+        "__Directive",
+        "__DirectiveLocation",
+    }
 
-    def __init__(self, old_schema, new_schema):
+    def __init__(self, old_schema, new_schema) -> None:
         self.old_schema = old_schema
         self.new_schema = new_schema
 
@@ -87,9 +99,15 @@ class Schema:
         if str(old.query_type) != str(new.query_type):
             changes.append(SchemaQueryTypeChanged(str(old.query_type), str(new.query_type)))
         if str(old.mutation_type) != str(new.mutation_type):
-            changes.append(SchemaMutationTypeChanged(str(old.mutation_type), str(new.mutation_type)))
+            changes.append(
+                SchemaMutationTypeChanged(str(old.mutation_type), str(new.mutation_type))
+            )
         if str(old.subscription_type) != str(new.subscription_type):
-            changes.append(SchemaSubscriptionTypeChanged(str(old.subscription_type), str(new.subscription_type)))
+            changes.append(
+                SchemaSubscriptionTypeChanged(
+                    str(old.subscription_type), str(new.subscription_type)
+                )
+            )
 
         return changes
 
@@ -117,7 +135,11 @@ class Schema:
     def common_type_changes(self):
         changes = []
 
-        common_types = (set(self.old_types.keys()) & set(self.new_types.keys())) - self.primitives - self.internal_types
+        common_types = (
+            (set(self.old_types.keys()) & set(self.new_types.keys()))
+            - self.primitives
+            - self.internal_types
+        )
         for type_name in common_types:
             old_type = self.old_types[type_name]
             new_type = self.new_types[type_name]
@@ -129,21 +151,22 @@ class Schema:
     def compare_types(old_type, new_type):
         changes = []
         if old_type.description != new_type.description:
-            changes.append(TypeDescriptionChanged(new_type.name, old_type.description, new_type.description))
+            changes.append(
+                TypeDescriptionChanged(new_type.name, old_type.description, new_type.description)
+            )
 
         if type_kind(old_type) != type_kind(new_type):
             changes.append(TypeKindChanged(new_type, type_kind(old_type), type_kind(new_type)))
-        else:
-            if is_enum_type(old_type):
-                changes += EnumDiff(old_type, new_type).diff()
-            elif is_union_type(old_type):
-                changes += UnionType(old_type, new_type).diff()
-            elif is_input_object_type(old_type):
-                changes += InputObjectType(old_type, new_type).diff()
-            elif is_object_type(old_type):
-                changes += ObjectType(old_type, new_type).diff()
-            elif is_interface_type(old_type):
-                changes += InterfaceType(old_type, new_type).diff()
+        elif is_enum_type(old_type):
+            changes += EnumDiff(old_type, new_type).diff()
+        elif is_union_type(old_type):
+            changes += UnionType(old_type, new_type).diff()
+        elif is_input_object_type(old_type):
+            changes += InputObjectType(old_type, new_type).diff()
+        elif is_object_type(old_type):
+            changes += ObjectType(old_type, new_type).diff()
+        elif is_interface_type(old_type):
+            changes += InterfaceType(old_type, new_type).diff()
 
         return changes
 
@@ -173,18 +196,14 @@ class Schema:
     def common_directives_changes(self):
         old_directive_names = {x.name for x in self.old_directives}
         new_directive_names = {x.name for x in self.new_directives}
-        old_directives = {
-            x.name: x
-            for x in self.old_directives
-        }
-        new_directives = {
-            x.name: x
-            for x in self.new_directives
-        }
+        old_directives = {x.name: x for x in self.old_directives}
+        new_directives = {x.name: x for x in self.new_directives}
 
         changes = []
         for directive_name in old_directive_names & new_directive_names:
-            changes += Directive(old_directives[directive_name], new_directives[directive_name]).diff()
+            changes += Directive(
+                old_directives[directive_name], new_directives[directive_name]
+            ).diff()
 
         return changes
 

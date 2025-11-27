@@ -1,0 +1,40 @@
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.5
+    hooks:
+      - id: ruff
+        name: Check 'ruff linter' passes
+        args: [--fix, --exit-non-zero-on-fix]
+
+      - id: ruff-format
+        name: Check 'ruff format' passes
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+
+      - id: end-of-file-fixer
+        name: Check files end in a newline character
+
+      - id: check-ast
+        name: Check files parse as valid Python
+
+      - id: check-json
+        name: Validate JSON syntax
+
+      - id: check-yaml
+        name: Validate YAML syntax
+
+      - id: check-merge-conflict
+        name: Check for merge conflict markers
+
+      - id: debug-statements
+        name: Check for debug breakpoints
+
+      - id: check-added-large-files
+        name: Check for large files
